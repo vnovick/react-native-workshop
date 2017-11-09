@@ -1,5 +1,5 @@
 import React from 'react';
-import { getMockData, postMessage } from '../services/api';
+import { getMessages, postMessage } from '../services/api';
 import { 
   View, 
   ImageBackground, 
@@ -25,11 +25,16 @@ export default class ChatScreen extends React.Component {
     keyboardVerticalOffset = Platform.OS === 'ios' ? 60 : 0
 
     componentDidMount() {
-        getMockData().then((messages) => {
-            this.setState({
-                messages
-            })
-        });
+      this.unsubscribeGetMessages = getMessages((snapshot) => {
+          this.setState({
+              messages: Object.values(snapshot.val())
+          })
+      })
+    }
+
+
+    componentWillUnmount() {
+        this.unsubscribeGetMessages();
     }
    
 
@@ -41,12 +46,14 @@ export default class ChatScreen extends React.Component {
                   behavior="padding"
                   keyboardVerticalOffset={this.keyboardVerticalOffset}
                   style={styles.container}>
-                  <FlatList
-                        style={styles.container}
-                        data={this.state.messages}
-                        renderItem={Message}
-                        keyExtractor={(item, index) => (`message-${index}`)}
-                    />
+                  { this.state.messages && 
+                    <FlatList
+                          style={styles.container}
+                          data={this.state.messages}
+                          renderItem={Message}
+                          keyExtractor={(item, index) => (`message-${index}`)}
+                      />
+                  }
                     <Compose submit={postMessage} />
                 </KeyboardAvoidingView>
             </ImageBackground>
