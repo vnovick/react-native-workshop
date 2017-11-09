@@ -17,6 +17,11 @@ export const mockMessages = [
   }
 ]
 
+export const postMessage = (message) => mockMessages.push({
+  incoming: false,
+  message
+});
+
 export const getMockData = () => (
   new Promise(resolve => setTimeout(() => resolve(mockMessages), 1000))
 )
